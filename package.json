@@ -1,0 +1,22 @@
+{
+  "name": "arachne-adapter",
+  "version": "1.0.0",
+  "description": "Generic adapter library for the Arachne Bot Framework.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node index.js",
+    "watch": "nodemon index.js"
+  },
+  "keywords": [
+    "bot",
+    "framework",
+    "arachne",
+    "chatops",
+    "chat"
+  ],
+  "author": "Kevin 'Nakasar' Thizy",
+  "license": "MIT",
+  "dependencies": {
+    "socket.io-client": "^2.1.1"
+  }
+}
