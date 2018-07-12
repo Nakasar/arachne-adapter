@@ -29,6 +29,7 @@ const adapter = arachne({
     brainUrl: (process.env.ARACHNE_URL || "").trim(),
     token: (process.env.ARACHNE_TOKEN || "").trim(),
     mongoURL: (process.env.ARACHNE_MONGO_URL || "").trim(),
+    admins: (process.env.ARACHNE_ADMINS || "").trim().split(","),
     sendMessage: (room, message) => {
 
     }
@@ -44,11 +45,12 @@ arachne(options)
 - `brainUrl` → The URL where to contact the brain.
 - `token` → The connector token to reach the brain.
 - `mongoURL` → a connection string with a mongo database.
+- `admins` → An array of admins (usernames).
 - `sendMessage` → a function that will be called by the adapter to execute hooks. You have to implement the sending of the `message` in the given `room` (specific client parsing, etc...).
 
 sendMessage(options)
 
-- `type` → "command" or "sentence". Command to send a command to the brain. Sentence to ue the natural language support.
+- `type` → "command" or "sentence". Command to send a command to the brain. Sentence to ue the natural language support. Use "admin" to trigger administrative commands on the adapter.
 - `text` → The text to send to the brain (Do not include any prefix like '!' or '@bot' !)
 - `username` → The username of the user that sent the message.
 - `room` → To unique name or id of the room where the message was typed.
