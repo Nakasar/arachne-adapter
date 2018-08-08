@@ -30,12 +30,43 @@ const adapter = arachne({
     token: (process.env.ARACHNE_TOKEN || "").trim(),
     mongoURL: (process.env.ARACHNE_MONGO_URL || "").trim(),
     admins: (process.env.ARACHNE_ADMINS || "").trim().split(","),
+    // If you want an api to handle your token,url,admins,hooks,
+    // black listed rooms, black listed cmds
+    createApi: true,
+    // The path your api will have
+    pathApi: "/api",
+    // Here if you want to enable your api, you need to put an
+    // Expressapp parameter ( ie express() object )
+    expressApp: app,
+    // If you want a dashboard or not, you need to set createApi to 
+    // True if you want to enable the dashboard
+    dashboard: true,
+    // Gestion is the parameter that decide if you want to include
+    // Black listed Rooms or/and black listed Cmds in your project
+    gestion: "blackListRooms,blackListCmds",
     sendMessage: (room, message) => {
 
     }
 });
 
-adapter.start();
+// If you enable your api, first start your adapter
+adapter.start().then(() => {
+    app.use('*', (req, res, next) => {
+        return res.sendStatus(404);
+    });
+    // Then start your express App
+    app.listen(YOURPORT, (err) => {
+        if (err) {
+            console.log("Could not start server !");
+            console.log(err);
+            throw err;
+        }
+        console.log('Example app listening on port YOURPORT!');
+        
+    });
+}).catch((err) => {
+    console.log("Couldnt start adapter");
+});
 ```
 
 #### Options
@@ -47,6 +78,10 @@ arachne(options)
 - `mongoURL` → a connection string with a mongo database.
 - `admins` → An array of admins (usernames).
 - `sendMessage` → a function that will be called by the adapter to execute hooks. You have to implement the sending of the `message` in the given `room` (specific client parsing, etc...).
+- `createApi` → true if you want to enable an API for your adapter to manage your token, brain url, admins, hooks, black listed rooms, black listed cmds
+- `pathApi` → the path your api will be rooted to ( default "/api")
+- `expressApp` → An instance of express
+- `gestion` → The list of modules you want to enable ( separated by ","), this list is : blackListRooms, blackListCmds
 
 sendMessage(options)
 
