@@ -1,0 +1,166 @@
+doctype html
+html
+    head
+        meta(charset="utf-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
+    
+        title Dashboard adapter RocketChat
+    
+        block css
+            link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css", integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm", crossorigin="anonymous")
+            link(rel="stylesheet", href=pathApi+"/dashboard/public/style/style.css")
+        
+        link(rel="icon" href=pathApi+"/dashboard/public/style/favicon.ico")
+    
+        script(defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js" integrity="sha384-SlE991lGASHoBfWbelyBPLsUlwY1GwNDJo3jSJO04KZ33K2bwfV9YBauFfnzvynJ" crossorigin="anonymous")
+    
+        block scripts
+            script(src="https://code.jquery.com/jquery-3.3.1.js", integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=", crossorigin="anonymous")
+            script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js", integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q", crossorigin="anonymous")
+            script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js", integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl", crossorigin="anonymous")
+
+    body
+        script.
+            const base_url = '#{pathApi}'
+        main.container-fluid
+            #skill-bar
+                h3 Dashboard
+      
+            #skill-monitor.p-1
+                .container          
+                    .card
+                        .card-header Hooks
+                        .card-body
+                            p.card-text
+                                | There are 
+                                strong #{hooks.length}
+                                |  hooks for the adapter.
+                            ul.list-group 
+                                each val in hooks
+                                    li.list-group-item.d-flex.justify-content-between.align-items-center Key : #{val.key} , Room : #{val.room} , Skill : #{val.skill}
+                                        button.btn.btn-danger(onClick="deleteHook('"+val.key+"')") Delete 
+                    .card
+                        .card-header Admins
+                        .card-body
+                            p.card-text
+                                | There are 
+                                strong #{admins.length}
+                                |  admins for the adapter.
+                            ul.list-group    
+                                each val in admins
+                                    li.list-group-item.d-flex.justify-content-between.align-items-center #{val}
+                                        button.btn.btn-danger(onClick="deleteAdmin('"+val+"')") Delete 
+                            br
+                            button.btn.btn-success(type='button', data-toggle='modal', data-target='#adminsModal')
+                                | Add an admin
+                    .card
+                        .card-header Brain Token
+                        .card-body
+                            .card-text.d-flex.justify-content-between.align-items-center
+                                | Brain Token : #{token}
+                                button.btn.btn-info(type='button', data-toggle='modal', data-target='#tokenModal') Modify
+                    .card
+                        .card-header Brain Url
+                        .card-body
+                            .card-text.d-flex.justify-content-between.align-items-center
+                                | Brain Url : #{urlBrain}
+                                button.btn.btn-info(type='button', data-toggle='modal', data-target='#urlBrainModal') Modify
+                    if roomsBlackListed
+                        .card
+                            .card-header Blacklisted Rooms
+                            .card-body
+                                p.card-text
+                                    | There are 
+                                    strong #{roomsBlackListed.length}
+                                    |  blacklisted rooms for the adapter.
+                                ul.list-group 
+                                    each val in roomsBlackListed
+                                        li.list-group-item.d-flex.justify-content-between.align-items-center Name : #{val}
+                                            button.btn.btn-danger(onClick="deleteBlackListedRoom('"+val+"')") Delete
+                                br
+                                button.btn.btn-success(type='button', data-toggle='modal', data-target='#roomsModal')
+                                    | Add a Room
+                    if cmdsBlackListed
+                        .card
+                            .card-header Blacklisted Cmds
+                            .card-body
+                                p.card-text
+                                    | There are 
+                                    strong #{cmdsBlackListed.length}
+                                    |  blacklisted cmds for the adapter.
+                                ul.list-group 
+                                    each val in cmdsBlackListed
+                                        li.list-group-item.d-flex.justify-content-between.align-items-center Name : #{val}
+                                            button.btn.btn-danger(onClick="deleteBlackListedCmd('"+val+"')") Delete
+                                br
+                                button.btn.btn-success(type='button', data-toggle='modal', data-target='#cmdsModal')
+                                    | Add a Cmd  
+                
+        
+        #roomsModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+            .modal-dialog(role='document')
+                .modal-content
+                    .modal-header
+                        h5#exampleModalLabel.modal-title Add a room
+                        button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                    .modal-body
+                        input#nameRoom.form-control
+                    .modal-footer
+                        button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+                        button.btn.btn-primary(type='button', onClick="addBlackListedRoom()") Add
+
+        #cmdsModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+            .modal-dialog(role='document')
+                .modal-content
+                    .modal-header
+                        h5#exampleModalLabel.modal-title Add a cmd
+                        button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                    .modal-body
+                        input#nameCmd.form-control
+                    .modal-footer
+                        button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+                        button.btn.btn-primary(type='button', onClick="addBlackListedCmd()") Add
+    
+        #adminsModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+            .modal-dialog(role='document')
+                .modal-content
+                    .modal-header
+                        h5#exampleModalLabel.modal-title Add an admin
+                        button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                    .modal-body
+                        input#nameAdmin.form-control
+                    .modal-footer
+                        button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+                        button.btn.btn-primary(type='button', onClick="addAdmin()") Add
+
+        #tokenModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+            .modal-dialog(role='document')
+                .modal-content
+                    .modal-header
+                        h5#exampleModalLabel.modal-title Modify the token
+                        button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                    .modal-body
+                        input#newToken.form-control
+                    .modal-footer
+                        button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+                        button.btn.btn-primary(type='button', onClick="modifyToken()") Add
+
+        #urlBrainModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+            .modal-dialog(role='document')
+                .modal-content
+                    .modal-header
+                        h5#exampleModalLabel.modal-title Modify the brain Url
+                        button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                    .modal-body
+                        input#newUrlBrain.form-control
+                    .modal-footer
+                        button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+                        button.btn.btn-primary(type='button', onClick="modifyUrlBrain()") Add
+
+script(src=pathApi+"/dashboard/public/scripts/main.js")
+script(src=pathApi+"/dashboard/public/scripts/notification.js")
